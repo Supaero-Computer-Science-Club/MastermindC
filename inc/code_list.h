@@ -1,14 +1,15 @@
 #ifndef CODE_LIST_H
 #define CODE_LIST_H
 #include <stdbool.h>
-#include "tools.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-typedef struct cell
+struct cell
 {
-    struct cell* previous;
-    struct cell* next;
-    int* code;
-    bool* tried;
+    struct cell *previous;
+    struct cell *next;
+    int *code;
+    bool tried;
 };
 
 /**
@@ -17,10 +18,10 @@ typedef struct cell
  */
 typedef struct code_list
 {
-    struct cell* first;
-    struct cell* last;
+    struct cell *first;
+    struct cell *last;
     int length;
-}code_list;
+} code_list;
 
 //////////////////////// Functions for cells
 
@@ -29,22 +30,22 @@ typedef struct code_list
  * 
  * @return a pointer to the cell created
  */
-struct cell* new_cell();
+struct cell *new_cell();
 
 /**
  * @brief Remove a code from the list, so that code->previous = code->next. 
  *        Don't forget to remove it from memory if necessary
  * 
- * @param cell : cell to remove
+ * @param p_cell : pointer to the cell to remove
  */
-void remove_cell(struct cell* cell);
+void remove_cell(struct cell *p_cell);
 
 /**
  * @brief Free a cell from memory
  * 
- * @param cell : cell to deallocate 
+ * @param p_cell : pointer to the cell to deallocate 
  */
-void free_cell(struct cell* cell);
+void free_cell(struct cell *p_cell);
 
 //////////////////////// Functions for lists
 
@@ -53,20 +54,22 @@ void free_cell(struct cell* cell);
  * 
  * @return a pointer to the list created
  */
-code_list* new_list();
+code_list *new_list();
 
 /**
  * @brief Add a cell to the end of the list
  * 
- * @param list 
+ * @param p_list pointer to the list
+ * 
+ * @param p_cell pointer to the cell to add
  */
-void append(code_list* list, struct cell* cell);
+void append(code_list *p_list, struct cell *p_cell);
 
 /**
- * @brief Free a code list from memory
+ * @brief Free a code list from memory, freeing its element in the process
  * 
- * @param list 
+ * @param p_list pointer to the list to deallocate
  */
-void free_list(code_list* list);
+void free_list(code_list *p_list);
 
 #endif
