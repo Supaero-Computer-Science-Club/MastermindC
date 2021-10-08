@@ -8,7 +8,7 @@ int* code_from_number(long int num, int code_length, int colors){
     }
     long int a = num;
     int b = 0;
-    for(int i = 0; i < code_length, i++){
+    for(int i = 0; i < code_length; i++){
         b = (int) num % colors;
         if(b < 0){
             b += colors;
@@ -23,7 +23,7 @@ int* code_from_number(long int num, int code_length, int colors){
 long int number_from_code(int* code, int code_length, int colors){
     long int num = 0;
     long int exp = 1;
-    for(i = 0; i < code_length; i++){
+    for(int i = 0; i < code_length; i++){
         num += exp * code[code_length - 1 - i];
         exp *= colors;
     }
@@ -35,19 +35,19 @@ int play_guess(int* p_guess, int* p_code, int code_length, int colors){
     int colors_c[code_length];
     int hits = 0;
     int colors_hits = 0;
-    for(i = 0; i < colors; i++){
+    for(int i = 0; i < colors; i++){
         colors_g[i] = 0;
         colors_c[i] = 0;
     }
-    for(i = 0; i < code_length; i ++){
-        if(p_guess[i] == p_cdoe[i]){
+    for(int i = 0; i < code_length; i ++){
+        if(p_guess[i] == p_code[i]){
             hits += 1;
         }else{
             colors_g[p_guess[i]] += 1;
             colors_c[p_code[i]]  += 1;
         }
     }
-    for(i = 0; i < colors; i++){
+    for(int i = 0; i < colors; i++){
         if(colors_g[i] < colors_c[i]){
             colors_hits += colors_g[i];
         }else{
