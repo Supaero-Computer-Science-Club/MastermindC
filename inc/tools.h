@@ -7,4 +7,6 @@ int* code_from_number(long int num, int code_length, int colors);
 
 long int number_from_code(int* p_code, int code_length, int colors);
 
+int play_guess(int* p_guess, int* p_code, int code_length, int colors);
+
 #endif

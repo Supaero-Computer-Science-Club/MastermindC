@@ -29,3 +29,31 @@ long int number_from_code(int* code, int code_length, int colors){
     }
     return num;
 }
+
+int play_guess(int* p_guess, int* p_code, int code_length, int colors){
+    int colors_g[code_length];
+    int colors_c[code_length];
+    int hits = 0;
+    int colors_hits = 0;
+    for(i = 0; i < colors; i++){
+        colors_g[i] = 0;
+        colors_c[i] = 0;
+    }
+    for(i = 0; i < code_length; i ++){
+        if(p_guess[i] == p_cdoe[i]){
+            hits += 1;
+        }else{
+            colors_g[p_guess[i]] += 1;
+            colors_c[p_code[i]]  += 1;
+        }
+    }
+    for(i = 0; i < colors; i++){
+        if(colors_g[i] < colors_c[i]){
+            colors_hits += colors_g[i];
+        }else{
+            colors_hits += colors_c[i];
+        }
+    }
+
+    return (code_length+1)*hits + colors_hits;
+}
