@@ -33,14 +33,6 @@ typedef struct code_list
 struct cell *new_cell();
 
 /**
- * @brief Remove a code from the list, so that code->previous = code->next. 
- *        Don't forget to remove it from memory if necessary
- * 
- * @param p_cell : pointer to the cell to remove
- */
-void remove_cell(struct cell *p_cell);
-
-/**
  * @brief Free a cell from memory
  * 
  * @param p_cell : pointer to the cell to deallocate 
@@ -71,5 +63,17 @@ void append(code_list *p_list, struct cell *p_cell);
  * @param p_list pointer to the list to deallocate
  */
 void free_list(code_list *p_list);
+
+/**
+ * @brief Remove a code from its list, so that code->previous = code->next. 
+ *        Don't forget to remove it from memory if necessary
+ * 
+ * @param p_list : pointer to the list containing the cell
+ *
+ * @param p_cell : pointer to the cell to remove
+ */
+void remove_cell(code_list* p_list, struct cell *p_cell);
+
+
 
 #endif
