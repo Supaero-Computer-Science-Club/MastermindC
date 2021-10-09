@@ -29,7 +29,7 @@ void remove_codes(code_list* p_list, int* p_guess, int score, int code_length, i
     int cur_score = 0;
     struct cell* cur_cell = p_list->first;
     struct cell* temp_cell = NULL;
-    while(cur_cell != p_list->last){
+    while(cur_cell != NULL){
         cur_score = play_guess(p_guess, cur_cell->code, code_length, colors);
         if(cur_score != score){
             remove_cell(p_list, cur_cell);
