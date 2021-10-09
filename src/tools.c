@@ -9,12 +9,12 @@ int* code_from_number(long int num, int code_length, int colors){
     long int a = num;
     int b = 0;
     for(int i = 0; i < code_length; i++){
-        b = (int) num % colors;
+        b = (int) a % colors;
         if(b < 0){
             b += colors;
         }
-        a = num/colors;
         p_code[code_length - 1 - i] = b;
+        a = a/colors;
     }
 
     return p_code;
