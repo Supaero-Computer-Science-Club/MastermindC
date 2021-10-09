@@ -7,11 +7,11 @@ code_list* generate_all_codes(int code_length, int colors){
     long int max_code = 1;
 
     //Calculate the highest possible code, using efficient power algorithm
-    long int base = code_length;
-    int exp = colors;
+    long int base = colors;
+    int exp = code_length;
     while(exp){
         if(exp % 2){
-            max_code *= code_length;
+            max_code *= base;
         }
         exp /= 2;
         base *= base;
@@ -32,11 +32,10 @@ void remove_codes(code_list* p_list, int* p_guess, int score, int code_length, i
     while(cur_cell != p_list->last){
         cur_score = play_guess(p_guess, cur_cell->code, code_length, colors);
         if(cur_score != score){
-            remove_cell(cur_cell);
-            p_list->length -= 1;
-            temp_cell = cur_cell -> next;
-            free_cell(cur_cell);
-            cur_cell = temp_cell;
+            remove_cell(p_list, cur_cell);
+            temp_cell = cur_cell;
+            cur_cell = cur_cell->next;
+            free_cell(temp_cell);
         }else{
             cur_cell = cur_cell->next;
         }
