@@ -31,8 +31,8 @@ long int number_from_code(int* code, int code_length, int colors){
 }
 
 int play_guess(int* p_guess, int* p_code, int code_length, int colors){
-    int colors_g[code_length];
-    int colors_c[code_length];
+    int colors_g[colors];
+    int colors_c[colors];
     int hits = 0;
     int colors_hits = 0;
     for(int i = 0; i < colors; i++){
