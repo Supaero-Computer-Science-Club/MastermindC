@@ -57,13 +57,18 @@ int max_score_code(int* code, code_list* p_list, int code_length, int colors){
     while(cur_cell != NULL){
         score = play_guess(code, cur_cell->code, code_length, colors);
         s_col = score%(code_length+1);
+        if(s_col < 0){
+            s_col += (code_length + 1);
+        }
         s_hit = score/(code_length+1);
         index = s_hit*(code_length+1) - s_hit*(s_hit-1)/2 + s_col;
         hitc_array[index] += 1;
-        if(hitc_array[index] > max_value){
-            max_value = hitc_array[index];
-        }
         cur_cell = cur_cell->next;
+    }
+    for(int i = 0; i < size_hitc_arr; i++){
+        if(hitc_array[i] > max_value){
+            max_value = hitc_array[i];
+        }
     }
 
     return max_value;
@@ -77,34 +82,56 @@ int* next_code(code_list* p_wlist, code_list* p_alist, code_list* p_tcode, int c
     bool tried;
     code_list minmax_set = {.first = NULL, .last = NULL, .length = 0};
 
+    //for all ccodes possible
+
     while(cur_cell != NULL){
-        tried = true;
+        
+        //check if the code has yet to be tried
         cur_cell2 = p_tcode->first;
         while(cur_cell2 != NULL){
+            tried = true;
             for(int i = 0; i < code_length; i++){
                 tried = tried && (cur_cell2->code[i] == cur_cell->code[i]);
             }
             if(tried){
+
                 cur_cell2 = NULL;
             }else{
                 cur_cell2 = cur_cell2->next;
             }
         }
         if(!tried){
-            max = p_wlist->length - max_score_code(cur_cell->code, p_wlist, code_length, colors);
+            max = max_score_code(cur_cell->code, p_wlist, code_length, colors);
+            max = p_wlist->length - max;
             if(max > minmax_value){
+                //frees minmax_set
+                cur_cell2 = minmax_set.first;
+                while(cur_cell2 != NULL){
+                    minmax_set.first = cur_cell2->next;
+                    free(cur_cell2);
+                    cur_cell2 = minmax_set.first;
+                }
+                //creates a copy of current code
+                cur_cell2 = new_cell();
+                cur_cell2->code = cur_cell->code;
+
+                //set new parameters and minmax set
                 minmax_value = max;
                 minmax_set.length = 1;
-                minmax_set.last = cur_cell;
-                minmax_set.first = cur_cell;
+                minmax_set.last = cur_cell2;
+                minmax_set.first = cur_cell2;
             }else{
                 if(max == minmax_value){
-                    append(&minmax_set, cur_cell);
+                    //creates a copy of current code
+                    cur_cell2 = new_cell();
+                    cur_cell2->code = cur_cell->code;
+                    append(&minmax_set, cur_cell2);
                 }
             }
         }
         cur_cell = cur_cell->next;
     }
+
     //look for an element in p_wlist
     cur_cell = minmax_set.first;
     bool same_code;
@@ -116,13 +143,31 @@ int* next_code(code_list* p_wlist, code_list* p_alist, code_list* p_tcode, int c
                 same_code = same_code && (cur_cell->code[i] == cur_cell2->code[i]);
             }
             if(same_code){
+                //frees minmax_set
+                cur_cell = cur_cell2;
+                cur_cell2 = minmax_set.first;
+                while(cur_cell2 != NULL){
+                    minmax_set.first = cur_cell2->next;
+                    free(cur_cell2);
+                    cur_cell2 = minmax_set.first;
+                }
                 return cur_cell->code;
             }
             cur_cell2 = cur_cell2->next;
         }
         cur_cell = cur_cell->next;
     }
-    return (minmax_set.first)->code;
+    //creates empty cell just to stock code
+    struct cell return_cell = {.previous = NULL, .next = NULL, .code = (minmax_set.first)->code};
+    
+    //frees minmax_set
+    cur_cell2 = minmax_set.first;
+    while(cur_cell2 != NULL){
+        minmax_set.first = cur_cell2->next;
+        free(cur_cell2);
+        cur_cell2 = minmax_set.first;
+    }
+    return return_cell.code;
 }
 
 int* minmax(int* s_code, int* c2t_code, int code_length, int colors){
@@ -139,13 +184,14 @@ int* minmax(int* s_code, int* c2t_code, int code_length, int colors){
         score = play_guess(code2try, s_code, code_length, colors);
         nb_tries += 1;
         temp_cell = new_cell();
-        temp_cell->code = code2try;
+        temp_cell->code = code2try; 
         append(t_codes, temp_cell);
-        if(score == colors*(code_length+1)){
+        if(score == code_length*(code_length+1)){
             is_won = true;
         }else{
             remove_codes(win_codes, code2try, score, code_length, colors);
             code2try = next_code(win_codes, all_codes, t_codes, code_length, colors);
+
         }
     }
     int* found_code_and_tries = malloc(sizeof(int)*(code_length+1));
@@ -158,6 +204,13 @@ int* minmax(int* s_code, int* c2t_code, int code_length, int colors){
     }
     free_list(all_codes);
     free_list(win_codes);
-    free_list(t_codes);
+    temp_cell = t_codes->first;
+    while(temp_cell != NULL){
+        t_codes->first = temp_cell->next;
+        free(temp_cell);
+        temp_cell = t_codes->first;
+    }
+    free(t_codes);
+
     return found_code_and_tries;
 }
