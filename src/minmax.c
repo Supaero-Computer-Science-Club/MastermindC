@@ -43,6 +43,7 @@ void remove_codes(code_list* p_list, int* p_guess, int score, int code_length, i
 }
 
 int max_score_code(int* code, code_list* p_list, int code_length, int colors){
+    //size of array
     int size_hitc_arr = (code_length+1)*(code_length+2)/2;
     int hitc_array[size_hitc_arr];
     int score = 0;
@@ -50,21 +51,30 @@ int max_score_code(int* code, code_list* p_list, int code_length, int colors){
     int s_col = 0;
     int index = 0;
     int max_value = 0;
+    //initialise array at 0
     for(int i = 0; i < size_hitc_arr; i++){
         hitc_array[i] = 0;
     }
     struct cell* cur_cell = p_list->first;
+
+    //for all cells
     while(cur_cell != NULL){
+        //get the score
         score = play_guess(code, cur_cell->code, code_length, colors);
+        //converts it to usable values
         s_col = score%(code_length+1);
         if(s_col < 0){
             s_col += (code_length + 1);
         }
         s_hit = score/(code_length+1);
+
+        //index to count
         index = s_hit*(code_length+1) - s_hit*(s_hit-1)/2 + s_col;
         hitc_array[index] += 1;
         cur_cell = cur_cell->next;
     }
+
+    //find the maximum value
     for(int i = 0; i < size_hitc_arr; i++){
         if(hitc_array[i] > max_value){
             max_value = hitc_array[i];
@@ -101,9 +111,11 @@ int* next_code(code_list* p_wlist, code_list* p_alist, code_list* p_tcode, int c
             }
         }
         if(!tried){
-            max = max_score_code(cur_cell->code, p_wlist, code_length, colors);
-            max = p_wlist->length - max;
+            //if not, find its "minmax value"
+            max = p_wlist->length - max_score_code(cur_cell->code, p_wlist, code_length, colors);
+            //check if new maximum
             if(max > minmax_value){
+
                 //frees minmax_set
                 cur_cell2 = minmax_set.first;
                 while(cur_cell2 != NULL){
@@ -115,7 +127,7 @@ int* next_code(code_list* p_wlist, code_list* p_alist, code_list* p_tcode, int c
                 cur_cell2 = new_cell();
                 cur_cell2->code = cur_cell->code;
 
-                //set new parameters and minmax set
+                //set new parameters and new minmax set
                 minmax_value = max;
                 minmax_set.length = 1;
                 minmax_set.last = cur_cell2;
@@ -125,6 +137,8 @@ int* next_code(code_list* p_wlist, code_list* p_alist, code_list* p_tcode, int c
                     //creates a copy of current code
                     cur_cell2 = new_cell();
                     cur_cell2->code = cur_cell->code;
+
+                    //adds it to minmax_set
                     append(&minmax_set, cur_cell2);
                 }
             }
@@ -132,7 +146,7 @@ int* next_code(code_list* p_wlist, code_list* p_alist, code_list* p_tcode, int c
         cur_cell = cur_cell->next;
     }
 
-    //look for an element in p_wlist
+    //look for an element in the list of possible winning codes
     cur_cell = minmax_set.first;
     bool same_code;
     while(cur_cell != NULL){
@@ -143,7 +157,8 @@ int* next_code(code_list* p_wlist, code_list* p_alist, code_list* p_tcode, int c
                 same_code = same_code && (cur_cell->code[i] == cur_cell2->code[i]);
             }
             if(same_code){
-                //frees minmax_set
+
+                //frees minmax_set before exiting function
                 cur_cell = cur_cell2;
                 cur_cell2 = minmax_set.first;
                 while(cur_cell2 != NULL){
@@ -151,23 +166,24 @@ int* next_code(code_list* p_wlist, code_list* p_alist, code_list* p_tcode, int c
                     free(cur_cell2);
                     cur_cell2 = minmax_set.first;
                 }
+                //Returns the code
                 return cur_cell->code;
             }
             cur_cell2 = cur_cell2->next;
         }
         cur_cell = cur_cell->next;
     }
-    //creates empty cell just to stock code
-    struct cell return_cell = {.previous = NULL, .next = NULL, .code = (minmax_set.first)->code};
+    //creates pointer to stock code
+    int* return_code = (minmax_set.first)->code;
     
-    //frees minmax_set
+    //frees minmax_set before exiting function
     cur_cell2 = minmax_set.first;
     while(cur_cell2 != NULL){
         minmax_set.first = cur_cell2->next;
         free(cur_cell2);
         cur_cell2 = minmax_set.first;
     }
-    return return_cell.code;
+    return return_code;
 }
 
 int* minmax(int* s_code, int* c2t_code, int code_length, int colors){
@@ -176,11 +192,17 @@ int* minmax(int* s_code, int* c2t_code, int code_length, int colors){
     int nb_tries = 0;
     int* code2try = c2t_code;
     int score = 0;
+    
+    //generates codes set
     code_list* all_codes = generate_all_codes(code_length, colors);
     code_list* win_codes = generate_all_codes(code_length, colors);
+
+    //create list of codes that have already been tried
     code_list* t_codes = new_list();
     struct cell* temp_cell;
     while(!is_won){
+
+        //play the guess
         score = play_guess(code2try, s_code, code_length, colors);
         nb_tries += 1;
         temp_cell = new_cell();
@@ -189,11 +211,14 @@ int* minmax(int* s_code, int* c2t_code, int code_length, int colors){
         if(score == code_length*(code_length+1)){
             is_won = true;
         }else{
+            //remove codes and find next one to try
             remove_codes(win_codes, code2try, score, code_length, colors);
             code2try = next_code(win_codes, all_codes, t_codes, code_length, colors);
 
         }
     }
+
+    //return array
     int* found_code_and_tries = malloc(sizeof(int)*(code_length+1));
     if(found_code_and_tries == NULL){
         printf("Error : cannot allocate memory to return found code in minmax \n");
@@ -202,8 +227,12 @@ int* minmax(int* s_code, int* c2t_code, int code_length, int colors){
     for(int i = 0; i < code_length; i++){
         found_code_and_tries[i+1] = code2try[i];
     }
+
+    //free everything
     free_list(all_codes);
     free_list(win_codes);
+
+    //the list of codes tried is done separatly 
     temp_cell = t_codes->first;
     while(temp_cell != NULL){
         t_codes->first = temp_cell->next;
