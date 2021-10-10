@@ -13,21 +13,8 @@ struct cell *new_cell()
     p_cell->previous = NULL;
     p_cell->next = NULL;
     p_cell->code = NULL;
-    p_cell->tried = false;
 
     return p_cell;
-}
-
-void remove_cell(struct cell *p_cell)
-{
-    if (p_cell->next != NULL)
-    {
-        p_cell->next->previous = p_cell->previous;
-    }
-    if (p_cell->previous != NULL)
-    {
-        p_cell->previous->next = p_cell->next;
-    }
 }
 
 void free_cell(struct cell *p_cell)
@@ -81,4 +68,21 @@ void free_list(code_list *p_list)
         free_cell(temp);
     }
     free(p_list);
+}
+
+void remove_cell(code_list* p_list, struct cell *p_cell)
+{
+    if(p_list->first == p_cell){
+        p_list->first = p_cell->next;
+    }   
+    if(p_list->last == p_cell){
+        p_list->last = p_cell->previous;
+    }
+    if(p_cell->next != NULL){
+        p_cell->next->previous = p_cell->previous;
+    }
+    if(p_cell->previous != NULL){
+        p_cell->previous->next = p_cell->next;
+    }
+    p_list->length -= 1;
 }
