@@ -2,4 +2,6 @@
 
 Compile using CMake 3.0 +
 
-DOES NOT WORK
+As of now, builds an empty executable in ./build/
+
+Edit solverApp.c in ./src/ to produce something.
