@@ -63,6 +63,7 @@ int max_score_code(int* code, code_list* p_list, int code_length, int colors){
         if(hitc_array[index] > max_value){
             max_value = hitc_array[index];
         }
+        cur_cell = cur_cell->next;
     }
 
     return max_value;
@@ -74,10 +75,7 @@ int* next_code(code_list* p_wlist, code_list* p_alist, code_list* p_tcode, int c
     int minmax_value = -1;
     int max = 0;
     bool tried;
-    code_list* minmax_set;
-    minmax_set->length = 0;
-    minmax_set->first = NULL;
-    minmax_set->last = NULL;
+    code_list minmax_set = {.first = NULL, .last = NULL, .length = 0};
 
     while(cur_cell != NULL){
         tried = true;
@@ -88,24 +86,27 @@ int* next_code(code_list* p_wlist, code_list* p_alist, code_list* p_tcode, int c
             }
             if(tried){
                 cur_cell2 = NULL;
+            }else{
+                cur_cell2 = cur_cell2->next;
             }
         }
         if(!tried){
             max = p_wlist->length - max_score_code(cur_cell->code, p_wlist, code_length, colors);
             if(max > minmax_value){
-                minmax_set->length = 1;
-                minmax_set->last = cur_cell;
-                minmax_set->first = cur_cell;
+                minmax_value = max;
+                minmax_set.length = 1;
+                minmax_set.last = cur_cell;
+                minmax_set.first = cur_cell;
             }else{
                 if(max == minmax_value){
-                    append(minmax_set, cur_cell);
+                    append(&minmax_set, cur_cell);
                 }
             }
         }
         cur_cell = cur_cell->next;
     }
     //look for an element in p_wlist
-    cur_cell = minmax_set->first;
+    cur_cell = minmax_set.first;
     bool same_code;
     while(cur_cell != NULL){
         cur_cell2 = p_wlist->first;
@@ -119,10 +120,9 @@ int* next_code(code_list* p_wlist, code_list* p_alist, code_list* p_tcode, int c
             }
             cur_cell2 = cur_cell2->next;
         }
-    cur_cell = cur_cell->next;
+        cur_cell = cur_cell->next;
     }
-
-    return minmax_set->first->code;
+    return (minmax_set.first)->code;
 }
 
 int* minmax(int* s_code, int* c2t_code, int code_length, int colors){
@@ -144,6 +144,7 @@ int* minmax(int* s_code, int* c2t_code, int code_length, int colors){
         if(score == colors*(code_length+1)){
             is_won = true;
         }else{
+            remove_codes(win_codes, code2try, score, code_length, colors);
             code2try = next_code(win_codes, all_codes, t_codes, code_length, colors);
         }
     }

@@ -1,4 +1,4 @@
-#import "tools.h"
+#include "tools.h"
 
 int* code_from_number(long int num, int code_length, int colors){
 
