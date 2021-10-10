@@ -13,7 +13,6 @@ struct cell *new_cell()
     p_cell->previous = NULL;
     p_cell->next = NULL;
     p_cell->code = NULL;
-    p_cell->tried = false;
 
     return p_cell;
 }

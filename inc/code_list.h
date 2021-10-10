@@ -9,7 +9,6 @@ struct cell
     struct cell *previous;
     struct cell *next;
     int *code;
-    bool tried;
 };
 
 /**
